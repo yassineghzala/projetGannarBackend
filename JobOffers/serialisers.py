@@ -6,7 +6,11 @@ class JobOfferSerializer(serializers.ModelSerializer):
         model = JobOffer
         fields = [
             'Id',
-            'details'
+            'name',
+            'description',
+            'workTime',
+            'salary',
+            'location',
         ]
 
 
@@ -16,7 +20,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         fields = [
             'Id',
             'candidate',
-            'jobOffer'
+            'jobOffer',
+            'candidate_score'
         ]
 
 
@@ -26,5 +31,6 @@ class MatchSerializer(serializers.ModelSerializer):
         fields = [
             'Id',
             'candidate',
-            'jobOffer'
+            'jobOffer',
+            'candidate_score'
         ]

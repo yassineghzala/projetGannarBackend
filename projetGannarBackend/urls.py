@@ -23,5 +23,6 @@ import Recruiters
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include('Recruiters.urls')),
-    path("api/", include('JobOffers.urls'))
+    path("api/", include('JobOffers.urls')),
+    path("api/", include('Candidates.urls'))
 ]
