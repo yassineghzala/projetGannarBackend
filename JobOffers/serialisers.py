@@ -6,11 +6,17 @@ class JobOfferSerializer(serializers.ModelSerializer):
         model = JobOffer
         fields = [
             'Id',
+            'recruiter',
             'name',
             'description',
             'workTime',
             'salary',
+            'skills',
+            'company',
+            'email',
+            'numtel',
             'location',
+            'expirationDate'
         ]
 
 

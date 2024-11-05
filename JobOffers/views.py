@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from Candidates.models import Candidate, Resume
-from Candidates.serialisers import ResumeSerializer
+from Candidates.serialisers import CandidateSerializer, ResumeSerializer
 from Recruiters.models import Recruiter
 from .models import Application, JobOffer, Match
 from rest_framework.views import APIView
@@ -86,6 +86,25 @@ def getApplications(request,CandidateId):
         application_serializer = ApplicationSerializer(candidateApplications,many=True)
         return JsonResponse(application_serializer.data,safe=False) 
 
+@api_view(['GET'])
+def getApplicationCandidates(request,JobOfferId):
+    candidates = []
+    if(request.method == 'GET'):
+        candidateApplications = Application.objects.all().filter(jobOffer=JobOfferId)
+        for c in candidateApplications:
+            newCandidate = Candidate.objects.get(id=c.candidate.id)
+            candidates.append(newCandidate)
+    print(candidates)
+    candidates_serializer = CandidateSerializer(candidates,many=True)
+    return JsonResponse(candidates_serializer.data,safe=False)
+
+
+@api_view(['GET'])
+def getJobOffersByRecruiter(request,recruiterId):
+    if(request.method == 'GET'):
+        jobOffers = JobOffer.objects.all().filter(recruiter=recruiterId)
+        jobOffers_serializer = JobOfferSerializer(jobOffers,many=True)
+        return JsonResponse(jobOffers_serializer.data,safe=False)
 
 @api_view(['POST'])
 def matchCandidateWithJobs(request,candidateId):
@@ -106,11 +125,6 @@ def matchCandidateWithJobs(request,candidateId):
             for jobSkill in job_skills:
                 if candidateSkill == jobSkill:
                     score = score + 1;
-        #print(f'candidate skills: ',candidate_skills)
-        #print(f'job skills: ',job_skills)
-        #print(job)
-        #print(candidate)
-        #print(score)
         if(score!=0):
             try:
                 match = Match.objects.get(jobOffer=job,candidate=candidate)

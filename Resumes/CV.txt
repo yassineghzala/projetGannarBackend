@@ -1,0 +1,33 @@
+Yassine Ghzala
+Tunis, Ariana |ghzalayassin@gmail.com |26 165 576
+Education
+Hannibal high school ,Experimental sciences Baccalaureate 2022
+Higher Institute of Technological Studies , BS in Informational Technology Ongoing
+Experience
+First Year Intern , STB BANK Jan 2023 – Feb 2023
+Second Year Intern , Wevioo Jan 2024 – FEB 2024
+•Developed a web application for client report managing for TFL Agencies.
+Projects
+Artvibe Club’s website github.com/name/repo
+•Developed a web application for Iset CH artvibe club where members can post, comment and react to posts
+related to art.
+•Tools Used: Angular, Spring Boot
+Brand Nerdvana’s website github.com/name/repo
+•Developed a web application for The brand Nerdvana where they can post their products for sale and where
+fans can also post their art.
+•Tools Used: Angular, Django
+Social Life
+Iset’CH Google Club:
+•Member in 2023
+•Dev Departement Assistant in 2023
+•President in 2023 / 2024
+Iset’CH Artvibe Club:
+•Member in 2023 / 2024
+Skills
+C#,C,Java,PHP,SQL,JavaScript,Typescript,Python Angular,.NET,Spring Boot,Symfony,Django
+Languages
+Arabic
+French
+English
+Certificates
+Croco coders Angular/springboot course 2023testString
