@@ -5,7 +5,7 @@ from Recruiters.models import Recruiter
 
 # Create your models here.
 class JobOffer(models.Model):
-    Id = models.AutoField(primary_key=True, editable=False,null=False)
+    Id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255,null=True)
     description = models.CharField(max_length=255,null=False)
     workTime = models.CharField(max_length=255,null=True)
@@ -16,7 +16,7 @@ class JobOffer(models.Model):
     company = models.CharField(max_length=255,null=True)
     email = models.CharField(max_length=255,null=True)
     numtel = models.CharField(max_length=255,null=True)
-    recruiter = models.ForeignKey(Recruiter,on_delete=models.CASCADE)
+    recruiter = models.ForeignKey(Recruiter,on_delete=models.CASCADE,default=1)
     candidate_application = models.ManyToManyField(Candidate, related_name='applications', through='Application')
     candidate_match = models.ManyToManyField(Candidate, related_name='matches', through='Match')
 
