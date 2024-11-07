@@ -9,10 +9,9 @@ class Resume(models.Model):
 
 class Candidate(AbstractUser):
     id = models.AutoField(primary_key=True, editable=False)
-    name = models.CharField(max_length=255,unique=True,null=True)
+    username = models.CharField(max_length=255,null=False,unique=True)
     email = models.CharField(max_length=255,unique=True)
     password = models.CharField(max_length=255)
-    username = models.CharField(max_length=255,null=False,unique=True)
     cv = models.OneToOneField(Resume,on_delete=models.CASCADE,null=True) 
 
     USERNAME_FIELD = 'email'
