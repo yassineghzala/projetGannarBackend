@@ -5,7 +5,7 @@ class CandidateSerializer(serializers.ModelSerializer):
         model = Candidate
         fields = [
             'id',
-            'name',
+            #'username',
             'email',
             'username',
             'password',
