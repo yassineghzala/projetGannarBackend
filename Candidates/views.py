@@ -47,6 +47,7 @@ def create_access_token(request):
         'exp': datetime.utcnow() + timedelta(minutes=60),
         'iat': datetime.utcnow() - timedelta(hours=1)
     }
+    
     token = jwt.encode(payload, 'secret', algorithm='HS256')
     #response.set_cookie(key='access_token', value=token, httponly=True)
     return token
