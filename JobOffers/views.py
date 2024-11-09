@@ -133,6 +133,18 @@ def mark_notification_as_read(request, notification_id):
     notification.save()
     return JsonResponse({"message": "Notification marked as read"})
 
+# View to mark all notification as read
+@api_view(["POST"])
+def mark_all_notifications_as_read(request, recruiter_id):
+    # Get the recruiter by ID
+    recruiter = get_object_or_404(Recruiter, id=recruiter_id)
+    
+    # Update all unread notifications for this recruiter
+    unread_notifications = Notification.objects.filter(recruiter=recruiter, read_status=False)
+    unread_notifications.update(read_status=True)
+    
+    return JsonResponse({"message": "All notifications marked as read for this recruiter."})
+
 # Notification views ------------------------------------------------
 @api_view(['GET'])
 def getMatches(request,CandidateId):
