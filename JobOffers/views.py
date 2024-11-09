@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from Candidates.models import Candidate, Resume
 from Candidates.serialisers import CandidateSerializer, ResumeSerializer
 from Recruiters.models import Recruiter
-from .models import Application, JobOffer, Match
+from .models import Application, JobOffer, Match, Notification
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view 
 from rest_framework.response import Response
@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from django.http import Http404
+from django.views.decorators.http import require_http_methods
 
 @api_view(['GET' , 'POST'])
 def JobOfferGP(request):
@@ -117,7 +118,22 @@ def apply(request,JobOfferId,CandidateId):
                 {"message":"Application created with success"},
                 status=status.HTTP_200_OK
             )
+# Notification views ------------------------------------------------
+@api_view(["GET"])
+def get_unread_notifications(request, recruiter_id):
+    unread_notifications = Notification.objects.filter(recruiter_id=recruiter_id, read_status=False)
+    data = [{"id": n.id, "content": n.content, "created_at": n.created_at} for n in unread_notifications]
+    return JsonResponse(data, safe=False)
 
+# View to mark a specific notification as read
+@api_view(["POST"])
+def mark_notification_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id)
+    notification.read_status = True
+    notification.save()
+    return JsonResponse({"message": "Notification marked as read"})
+
+# Notification views ------------------------------------------------
 @api_view(['GET'])
 def getMatches(request,CandidateId):
     if(request.method == 'GET'):
