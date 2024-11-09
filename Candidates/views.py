@@ -44,8 +44,8 @@ def create_access_token(request):
         'id': user.id,
         'name': user.name,
         'email': user.email,
-        'exp': datetime.now() + timedelta(minutes=60),
-        'iat': datetime.now()
+        'exp': datetime.utcnow() + timedelta(minutes=60),
+        'iat': datetime.utcnow() - timedelta(hours=1)
     }
     token = jwt.encode(payload, 'secret', algorithm='HS256')
     #response.set_cookie(key='access_token', value=token, httponly=True)
@@ -63,8 +63,8 @@ def create_refresh_token(request):
         'id': user.id,
         'name': user.name,
         'email': user.email,
-        'exp': datetime.now() + timedelta(minutes=120),
-        'iat': datetime.now()
+        'exp': datetime.utcnow() + timedelta(minutes=120),
+        'iat': datetime.utcnow() - timedelta(hours=1)
     }
     token = jwt.encode(payload, 'secret', algorithm='HS256')
     return token        
@@ -75,8 +75,8 @@ class LoginView(APIView):
         refresh_token = create_refresh_token(request)
         token = {'access_token': access_token,'refresh_token': refresh_token}
         response = Response(data=token) 
-        response.set_cookie(key='access', value=access_token, httponly=True)
-        response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+        response.set_cookie(key='access', value=access_token, httponly=True,samesite='None',secure=True)
+        response.set_cookie(key='refresh', value=refresh_token, httponly=True,samesite='None',secure=True)
         return response
 
 
@@ -118,7 +118,7 @@ class UserView(APIView):
     
     def post(self, request):
         auth_header = request.headers.get('Authorization', '')
-        token = request.COOKIES.get('jwt')
+        token = request.COOKIES.get('access')
 
         print(request.COOKIES)
         try:
@@ -126,16 +126,16 @@ class UserView(APIView):
             if isinstance(token, str):
                 token = token.encode('utf-8')  # Convert the string to bytes
             
-            payload = jwt.decode(token,'secret321', algorithms=["HS256"], verify=True)
+            payload = jwt.decode(token,'secret', algorithms=["HS256"], options={"verify_signature": False})
             
-            user = Candidate.objects.filter(id=payload['user_id']).first()
+            user = Candidate.objects.filter(id=payload['id']).first()
             serializer = CandidateSerializer(user)
             print(serializer.data)
             return Response(serializer.data)
         
         except jwt.DecodeError as e:
             print("Token decode error:", e)
-            return Response({'detail': 'Internal Server Error'}, status=500)
+            return Response({'detail': 'AAInternal Server Error'}, status=500)
             
     
 @api_view(['GET' , 'POST'])

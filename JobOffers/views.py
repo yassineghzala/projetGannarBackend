@@ -82,7 +82,7 @@ def apply(request,JobOfferId,CandidateId):
             status=status.HTTP_404_NOT_FOUND
             )
 
-    candidate_skills = cv.skills.split(',')
+    candidate_skills = cv.skills
     job_skills = jobOffer.skills.split(',')
 
     try:
@@ -244,11 +244,11 @@ def matchCandidateWithJobs(request,candidateId):
                 {"error": "No applications for candidate with given Id exists"},
                 status=status.HTTP_404_NOT_FOUND              
         )
-    #matches = Match.objects.all()
+    matches = Match.objects.all()
     jobOffers = JobOffer.objects.all()
-
-    candidate_skills = cv.skills.split(',')
-    
+    print(cv.skills.strip('[').strip(']'))
+    candidate_skills = cv.skills
+    print(candidate_skills)
     for job in jobOffers:
         job_skills = job.skills.split(',')
         score = 0
@@ -270,8 +270,8 @@ def matchCandidateWithJobs(request,candidateId):
                 print("Objects doesnt exists, a new match is created!") 
                 newMatch.save()
                 return Response(
-                    {"message":"Application created with success"},
+                    {"message":"Match created with success"},
                     status=status.HTTP_200_OK
                 )
-        #matches_serializer = MatchSerializer(matches,many=True)
-    #return JsonResponse(matches_serializer.data,safe=False) 
+        matches_serializer = MatchSerializer(matches,many=True)
+    return JsonResponse(matches_serializer.data,safe=False) 

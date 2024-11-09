@@ -24,6 +24,7 @@ class Resume(models.Model):
     reco_field = models.CharField(max_length=255,null=True)
     cand_level = models.CharField(max_length=255,null=True)
     skills = models.CharField(max_length=255,null=True)
+    recommended_skills = models.CharField(max_length=255,null=True)
     courses = models.CharField(max_length=255,null=True)
     pdf_name = models.CharField(max_length=255,null=True)
 
@@ -36,6 +37,6 @@ class Candidate(models.Model):
     address = models.CharField(max_length=255,null=True)
     dateOfBirth = models.CharField(max_length=255,null=True) 
     cv = models.OneToOneField(Resume,on_delete=models.CASCADE,null=True) 
-
+    role = models.CharField(max_length=255,null=True)
     #USERNAME_FIELD = 'email'
     #REQUIRED_FIELDS = []
