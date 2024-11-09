@@ -12,9 +12,9 @@ class Recruiter(models.Model):
     domain = models.CharField(max_length=255,null=True)
     phoneNumber = models.CharField(max_length=255,null=True)
 
-class Notification(models.Model):
-    id = models.AutoField(primary_key=True, editable=False)
-    message = models.CharField(max_length=255,null=True)
-    date = models.DateTimeField(null=True)
-    recruiter = models.ForeignKey(Recruiter,on_delete=models.CASCADE,default=1)
+# class Notification(models.Model):
+#     id = models.AutoField(primary_key=True, editable=False)
+#     message = models.CharField(max_length=255,null=True)
+#     date = models.DateTimeField(null=True)
+#     recruiter = models.ForeignKey(Recruiter,on_delete=models.CASCADE,default=1)
     

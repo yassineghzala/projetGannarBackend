@@ -3,11 +3,11 @@ from django.shortcuts import render, get_object_or_404
 import jwt
 from Candidates.models import Candidate
 from JobOffers.models import JobOffer
-from Recruiters.models import Notification, Recruiter
+from Recruiters.models import  Recruiter
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view 
 from rest_framework.response import Response
-from .serialisers import NotificationSerializer, RecruiterSerializer
+from .serialisers import  RecruiterSerializer
 from django.http import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.exceptions import AuthenticationFailed
@@ -46,40 +46,40 @@ def RecruiterGPD(request,Id):
 
 
 
-@api_view(['POST','GET'])
-def notifyRecruiter(request,recruiterId,jobOfferId,candidateId):
+# @api_view(['POST','GET'])
+# def notifyRecruiter(request,recruiterId,jobOfferId,candidateId):
 
-    jobOffer = get_object_or_404(JobOffer,pk=jobOfferId)
-    candidate = get_object_or_404(Candidate,pk=candidateId)
+#     jobOffer = get_object_or_404(JobOffer,pk=jobOfferId)
+#     candidate = get_object_or_404(Candidate,pk=candidateId)
 
-    if(request.method == 'POST'):
-        notification = Notification(recruiter=recruiterId,message="candidate ${candidate.name} has applied for job ${jobOffer.name}",date=datetime.now(),id=0)
-        notification_serializer = NotificationSerializer(data=request.data)
-        if notification_serializer.is_valid():
-            notification_serializer.save()
-        return JsonResponse(notification_serializer.data,safe=False)
+#     if(request.method == 'POST'):
+#         notification = Notification(recruiter=recruiterId,message="candidate ${candidate.name} has applied for job ${jobOffer.name}",date=datetime.now(),id=0)
+#         notification_serializer = NotificationSerializer(data=request.data)
+#         if notification_serializer.is_valid():
+#             notification_serializer.save()
+#         return JsonResponse(notification_serializer.data,safe=False)
     
-    elif(request.method=='GET'):
-        notifications = Notification.objects.all()
-        notification_serializer = NotificationSerializer(notifications, many=True)
-        return JsonResponse(notification_serializer.data,safe=False)
+#     elif(request.method=='GET'):
+#         notifications = Notification.objects.all()
+#         notification_serializer = NotificationSerializer(notifications, many=True)
+#         return JsonResponse(notification_serializer.data,safe=False)
     
 
 
 
-@api_view(['DELETE'])
-def deleteNotification(request,notificationId):
-    notifications = Notification.objects.all()
-    notification_serializer = NotificationSerializer(notifications, many=True)
-    try:
-        notification = get_object_or_404(Notification,pk=notificationId)
-        notification.delete()
-        return JsonResponse(notification_serializer.data,safe=False)
-    except Http404:
-        return Response(
-            {"error": "No notification with given Id exists"},
-            status=status.HTTP_404_NOT_FOUND
-            ) 
+# @api_view(['DELETE'])
+# def deleteNotification(request,notificationId):
+#     notifications = Notification.objects.all()
+#     notification_serializer = NotificationSerializer(notifications, many=True)
+#     try:
+#         notification = get_object_or_404(Notification,pk=notificationId)
+#         notification.delete()
+#         return JsonResponse(notification_serializer.data,safe=False)
+#     except Http404:
+#         return Response(
+#             {"error": "No notification with given Id exists"},
+#             status=status.HTTP_404_NOT_FOUND
+#             ) 
 
 def create_access_token(request):
     email = request.data['email']

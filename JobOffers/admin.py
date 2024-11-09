@@ -1,6 +1,7 @@
 from django.contrib import admin
+from .models import JobOffer, Notification,Application
 
-from JobOffers.models import JobOffer
-
-# Register your models here.
+# Register models separately
 admin.site.register(JobOffer)
+admin.site.register(Notification)
+admin.site.register(Application)

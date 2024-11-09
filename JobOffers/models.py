@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 from Candidates.models import Candidate
 from Recruiters.models import Recruiter
 
@@ -35,3 +35,16 @@ class Match(models.Model):
     candidate_score = models.FloatField(null=True)
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
     jobOffer = models.ForeignKey(JobOffer, on_delete=models.CASCADE)
+
+
+
+class Notification(models.Model):
+    content = models.TextField()
+    read_status = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+    recruiter = models.ForeignKey(Recruiter, on_delete=models.CASCADE, related_name='notifications')
+    job_offer = models.ForeignKey(JobOffer, on_delete=models.CASCADE)
+    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Notification for {self.recruiter.name} about {self.job_offer.name}"    
