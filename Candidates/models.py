@@ -7,12 +7,15 @@ class Resume(models.Model):
     file = models.FileField(upload_to="Resumes") 
     skills = models.CharField(max_length=255,null=True)
 
-class Candidate(AbstractUser):
+class Candidate(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
-    username = models.CharField(max_length=255,null=False,unique=True)
+    name = models.CharField(max_length=255,null=False,unique=True)
     email = models.CharField(max_length=255,unique=True)
-    password = models.CharField(max_length=255)
+    password = models.CharField(max_length=255,null=True)
+    phoneNumber = models.CharField(max_length=255,null=True)
+    address = models.CharField(max_length=255,null=True)
+    dateOfBirth = models.CharField(max_length=255,null=True) 
     cv = models.OneToOneField(Resume,on_delete=models.CASCADE,null=True) 
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    #USERNAME_FIELD = 'email'
+    #REQUIRED_FIELDS = []

@@ -5,10 +5,12 @@ class CandidateSerializer(serializers.ModelSerializer):
         model = Candidate
         fields = [
             'id',
-            #'username',
             'email',
-            'username',
+            'name',
             'password',
+            'address',
+            'phoneNumber',
+            'dateOfBirth',
             'cv'
         ]
         extra_kwargs = {

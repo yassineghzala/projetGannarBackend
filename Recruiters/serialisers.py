@@ -1,10 +1,25 @@
 from rest_framework import serializers
-from .models import Recruiter
+from .models import Recruiter, Notification
 class RecruiterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recruiter
         fields = [
-            'Id',
+            'id',
             'name',
             'email',
+            'password',
+            'company',
+            'companyAddress',
+            'domain',
+            'post',
+            'phoneNumber'
+        ]
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = [
+            'id',
+            'message',
+            'date',
+            'recruiter',
         ]

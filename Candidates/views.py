@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.shortcuts import render, get_object_or_404
 import jwt
 from Candidates.models import Candidate, Resume
@@ -13,7 +15,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.backends import TokenBackend
-
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import status
 from django.http import Http404
 # Create your views here.
@@ -30,43 +32,88 @@ class RegisterView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-    
+def create_access_token(request):
+    email = request.data['email']
+    password = request.data['password']
+    user = Candidate.objects.filter(email=email).first()
+    if user is None:
+        raise AuthenticationFailed('User not found!')
+    if user.password != password:
+        raise AuthenticationFailed('Incorrect password!')
+    payload = {
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'exp': datetime.now() + timedelta(minutes=60),
+        'iat': datetime.now()
+    }
+    token = jwt.encode(payload, 'secret', algorithm='HS256')
+    #response.set_cookie(key='access_token', value=token, httponly=True)
+    return token
+
+def create_refresh_token(request):
+    email = request.data['email']
+    password = request.data['password']
+    user = Candidate.objects.filter(email=email).first()
+    if user is None:
+        raise AuthenticationFailed('User not found!')
+    if user.password != password:
+        raise AuthenticationFailed('Incorrect password!')
+    payload = {
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'exp': datetime.now() + timedelta(minutes=120),
+        'iat': datetime.now()
+    }
+    token = jwt.encode(payload, 'secret', algorithm='HS256')
+    return token        
+        
+class LoginView(APIView):
+    def post(self,request):
+        access_token = create_access_token(request)
+        refresh_token = create_refresh_token(request)
+        token = {'access_token': access_token,'refresh_token': refresh_token}
+        response = Response(data=token) 
+        response.set_cookie(key='access', value=access_token, httponly=True)
+        response.set_cookie(key='refresh', value=refresh_token, httponly=True)
+        return response
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        token['id'] = user.id
-        token['name'] = user.name
-        token['email'] = user.email
-
-        return token
-
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
-
-    def post(self, request):  
-        email = request.data.get('email')
-        password = request.data.get('password')
-        candidate = Candidate.objects.get(email=email)
-        print(candidate.password)
-        if candidate and (candidate.password == password):
-
-            token = self.serializer_class.get_token(candidate)
-
-            access_token = str(token.access_token)
-            refresh_token = str(token)
-
-            response = Response()
-            response.data = {
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }
-            response.set_cookie(key='jwt', value=refresh_token, httponly=True,secure=True,samesite='None')
-            return response
-        return Response({'detail': 'Invalid credentials'}, status=400)
-    
+#class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#    @classmethod
+#    def get_token(cls, user):
+#        token = super().get_token(user)
+#        token['id'] = user.id
+#        token['name'] = user.name
+#        token['email'] = user.email
+#
+#        return token
+#
+#class MyTokenObtainPairView(TokenObtainPairView):
+#    serializer_class = MyTokenObtainPairSerializer
+#
+#    def post(self, request):  
+#        email = request.data.get('email')
+#        password = request.data.get('password')
+#        candidate = Candidate.objects.get(email=email)
+#        print(candidate.password)
+#        if candidate and (candidate.password == password):
+#
+#            token = self.serializer_class.get_token(candidate)
+#
+#            access_token = str(token.access_token)
+#            refresh_token = str(token)
+#
+#            response = Response()
+#            response.data = {
+#                'access_token': access_token,
+#                'refresh_token': refresh_token
+#            }
+#            response.set_cookie(key='jwt', value=refresh_token, httponly=True,secure=True,samesite='None')
+#            return response
+#        return Response({'detail': 'Invalid credentials'}, status=400)
+#    
 class UserView(APIView):
     
     def post(self, request):

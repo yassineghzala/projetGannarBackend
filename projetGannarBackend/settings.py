@@ -85,7 +85,7 @@ DATABASES = {
     "default": {
 
         "ENGINE":"django.db.backends.mysql" ,
-        "NAME": 'projetIntegrationBackend',
+        "NAME": 'djangobackend',
         "USER": 'root',
         "PASSWORD": '',
         'HOST': 'localhost',  # Or the IP address of your MySQL server
@@ -144,7 +144,7 @@ CORS_ALLOW_HEADER ={
     'authorization',
     'content-type'
 }
-AUTH_USER_MODEL = 'Candidates.Candidate'
+#AUTH_USER_MODEL = 'Candidates.Candidate'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',

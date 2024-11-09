@@ -2,7 +2,7 @@ from django.urls import path
 
 from Candidates.views import CandidateGP, CandidateGPD, RegisterView, ResumeGP
 from JobOffers.views import JobOfferGP
-from .views import MyTokenObtainPairView, UserView
+from .views import LoginView, UserView
 
 from rest_framework_simplejwt.views import (
 
@@ -15,6 +15,6 @@ urlpatterns = [
     path('recruiters/<int:Id>', CandidateGPD),
     path('resumes', ResumeGP),
     path('register',RegisterView.as_view()),
-    path('token', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('candidate-token', LoginView.as_view()),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]
