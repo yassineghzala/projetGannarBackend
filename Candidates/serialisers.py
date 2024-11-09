@@ -10,6 +10,7 @@ class CandidateSerializer(serializers.ModelSerializer):
             'password',
             'address',
             'phoneNumber',
+            'role',
             'dateOfBirth',
             'cv'
         ]
