@@ -60,8 +60,8 @@ def JobOfferGPD(request,JobOfferId):
 @api_view(['GET'])
 def getApplicationByCandidateIdAndJobOfferId(request,candidateId,jobOfferId):
     try:
-        application = Application.objects.filter(jobOffer=jobOfferId,candidate=candidateId)
-        application_serializer = ApplicationSerializer(application,many=True)
+        application = Application.objects.get(jobOffer=jobOfferId,candidate=candidateId)
+        application_serializer = ApplicationSerializer(application,many=False)
         return JsonResponse(application_serializer.data,safe=False)
 
     except Application.DoesNotExist:
@@ -85,14 +85,14 @@ def apply(request,JobOfferId,CandidateId):
         candidate = get_object_or_404(Candidate,pk=CandidateId)
     except Http404:
         return Response(
-            {"error": "No jobOffer with given Id exists"},
+            {"error": "No candidate with given Id exists"},
             status=status.HTTP_404_NOT_FOUND
             )
     try:
         cv = get_object_or_404(Resume,pk=candidate.cv_id)
     except Http404:
         return Response(
-            {"error": "No jobOffer with given Id exists"},
+            {"error": "No resume with given Id exists"},
             status=status.HTTP_404_NOT_FOUND
             )
 
