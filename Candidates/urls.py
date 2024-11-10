@@ -14,7 +14,7 @@ urlpatterns = [
     path('candidate', UserView.as_view()),
     path('recruiters/<int:Id>', CandidateGPD),
     path('resumes', ResumeGP),
-    path('register',RegisterView.as_view()),
-    path('/candidate/login', LoginView.as_view()),
+    path('candidates/register',RegisterView.as_view()),
+    path('candidate/login', LoginView.as_view()),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]

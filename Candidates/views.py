@@ -23,15 +23,21 @@ from django.http import Http404
 class RegisterView(APIView):
     def post(self, request):
         try:
-            serializer = CandidateSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
-        except Exception as e:
+            email = request.data['email']
+            print(email)
+            candidate = Candidate.objects.get(email=email)
             return Response(
-                {"error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "candidate with email already exists"},
+                status=status.HTTP_409_CONFLICT
             )
+        except Candidate.DoesNotExist:
+                serializer = CandidateSerializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(
+                    {"message": "candidate registered with success"},
+                    status=status.HTTP_200_OK
+                )
 def create_access_token(request):
     email = request.data['email']
     password = request.data['password']

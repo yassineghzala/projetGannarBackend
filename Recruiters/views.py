@@ -15,18 +15,35 @@ from datetime import datetime
 from django.http import Http404
 from rest_framework import status
 # Create your views here.
-
+class RegisterView(APIView):
+    def post(self, request):
+        try:
+            email = request.data['email']
+            print(email)
+            recruiter = Recruiter.objects.get(email=email)
+            return Response(
+                {"error": "recruiter with email already exists"},
+                status=status.HTTP_409_CONFLICT
+            )
+        except Recruiter.DoesNotExist:
+                serializer = RecruiterSerializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(
+                    {"message": "recruiter registered with success"},
+                    status=status.HTTP_200_OK
+                )
 @api_view(['GET' , 'POST'])
 def RecruiterGP(request):
     if(request.method == "GET"):
         recruiters = Recruiter.objects.all()
         recruiter_serializer = RecruiterSerializer(recruiters, many=True)
         return JsonResponse(recruiter_serializer.data,safe=False)
-    elif(request.method == 'POST'):
-        recruiter_serializer = RecruiterSerializer(data=request.data)
-        if recruiter_serializer.is_valid():
-            recruiter_serializer.save()
-        return JsonResponse(recruiter_serializer.data,safe=False)
+    #elif(request.method == 'POST'):
+    #    recruiter_serializer = RecruiterSerializer(data=request.data)
+    #    if recruiter_serializer.is_valid():
+    #        recruiter_serializer.save()
+    #    return JsonResponse(recruiter_serializer.data,safe=False)
 
 @api_view(['GET' , 'PUT' , 'DELETE'])
 def RecruiterGPD(request,Id):

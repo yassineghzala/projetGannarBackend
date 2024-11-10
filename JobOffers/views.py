@@ -58,6 +58,20 @@ def JobOfferGPD(request,JobOfferId):
     return JsonResponse(jobOffer_serializer.data)
 
 @api_view(['GET'])
+def getApplicationByCandidateIdAndJobOfferId(request,candidateId,jobOfferId):
+    try:
+        application = Application.objects.filter(jobOffer=jobOfferId,candidate=candidateId)
+        application_serializer = ApplicationSerializer(application,many=True)
+        return JsonResponse(application_serializer.data,safe=False)
+
+    except Application.DoesNotExist:
+        return Response(
+            {"message":"Application not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(['GET'])
 def apply(request,JobOfferId,CandidateId):
 
     try:
