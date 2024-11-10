@@ -30,7 +30,7 @@ class Resume(models.Model):
 
 class Candidate(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
-    name = models.CharField(max_length=255,null=False,unique=True)
+    name = models.CharField(max_length=255,null=False)
     email = models.CharField(max_length=255,unique=True)
     password = models.CharField(max_length=255,null=True)
     phoneNumber = models.CharField(max_length=255,null=True)
