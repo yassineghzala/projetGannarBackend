@@ -2,7 +2,9 @@ from datetime import datetime, timedelta
 from django.shortcuts import render, get_object_or_404
 import jwt
 from Candidates.models import Candidate
-from JobOffers.models import JobOffer
+from Candidates.serialisers import CandidateSerializer
+from JobOffers.models import JobOffer,Application
+from JobOffers.serialisers import JobOfferSerializer
 from Recruiters.models import  Recruiter
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view 
@@ -61,7 +63,23 @@ def RecruiterGPD(request,Id):
         recruiter.delete();
     return JsonResponse(recruiter_serializer.data)
 
-
+@api_view(['GET'])
+def getCandidatesByRecruiterId(request, recruiterId):
+    try:
+        job_offers = JobOffer.objects.filter(recruiter_id=recruiterId)
+        result = []
+        for job_offer in job_offers:
+            applications = Application.objects.filter(jobOffer=job_offer)
+            candidates = Candidate.objects.filter(id__in=applications.values_list('candidate_id', flat=True)).distinct()
+            candidate_serializer = CandidateSerializer(candidates, many=True)
+            job_offer_serializer = JobOfferSerializer(job_offer)
+            result.append({
+                'job_offer': job_offer_serializer.data,
+                'candidates': candidate_serializer.data
+            })
+        return JsonResponse(result, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 # @api_view(['POST','GET'])
 # def notifyRecruiter(request,recruiterId,jobOfferId,candidateId):
