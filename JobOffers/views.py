@@ -221,6 +221,16 @@ def getApplicationCandidates(request,JobOfferId):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )    
         
+@api_view(['DELETE'])
+def deleteApplicationById(request, applicationId):
+    try:
+        application = get_object_or_404(Application, pk=applicationId)
+        application.delete()
+        return JsonResponse({"message": "Application deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    except Http404:
+        return JsonResponse({"error": "Application not found."}, status=status.HTTP_404_NOT_FOUND)
+    except DatabaseError:
+        return JsonResponse({"error": "Database error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
 @api_view(['GET'])
 def getJobOffersByRecruiter(request,recruiterId):
     if(request.method == 'GET'):
