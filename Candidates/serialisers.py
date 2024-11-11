@@ -30,6 +30,27 @@ class ResumeSerializer(serializers.ModelSerializer):
         model = Resume
         fields = [
             'Id',
-            'file',
-            'skills'
+            'sec_token',
+            'ip_add',
+            'host_name',
+            'dev_user',
+            'os_name_ver',
+            'latlong',
+            'city',
+            'state',
+            'country',
+            'act_name',
+            'act_mail',
+            'act_mob',
+            'name',
+            'email',
+            'res_score',
+            'timestamp',
+            'no_of_pages',
+            'reco_field',
+            'cand_level',
+            'skills',
+            'recommended_skills',
+            'courses',
+            'pdf_name'
         ]

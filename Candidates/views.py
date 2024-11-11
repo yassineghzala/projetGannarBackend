@@ -171,6 +171,16 @@ def CandidateGPD(request,Id):
         candidate.delete();
     return JsonResponse(candidate_serializer.data)
 
+@api_view(['GET'])
+def getCVByCandidateId(request,candidateId):
+    if(request.method=='GET'):
+        candidate = get_object_or_404(Candidate,pk=candidateId)
+        print(candidate.cv)
+        CV = candidate.cv
+        #CV = get_object_or_404(Resume,pk=CV_id)
+        CV_serializer = ResumeSerializer(CV)
+        return JsonResponse(CV_serializer.data,safe=False)
+
 from django.core.files.storage import default_storage
 import PyPDF2 # type: ignore
 @api_view(['POST'])
