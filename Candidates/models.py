@@ -37,6 +37,7 @@ class Candidate(models.Model):
     address = models.CharField(max_length=255,null=True)
     dateOfBirth = models.CharField(max_length=255,null=True) 
     cv = models.OneToOneField(Resume,on_delete=models.CASCADE,null=True) 
+    #OneToOneField(Resume,on_delete=models.CASCADE,null=True) 
     role = models.CharField(max_length=255,null=True)
     #USERNAME_FIELD = 'email'
     #REQUIRED_FIELDS = []
