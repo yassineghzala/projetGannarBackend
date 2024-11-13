@@ -171,7 +171,7 @@ def getMatches(request,CandidateId):
         except Http404:
             return Response(
                 {"error": "No matches for candidate with given Id exists"},
-                status=status.HTTP_404_NOT_FOUND               
+                status=status.HTTP_404_NOT_FOUND
             )
         except DatabaseError:
             return Response(
@@ -251,51 +251,35 @@ def getJobOffersByRecruiter(request,recruiterId):
             )  
 
 @api_view(['POST'])
-def matchCandidateWithJobs(request,candidateId):
-
+def matchCandidateWithJobs(request, candidateId):
     try:
-        candidate = get_object_or_404(Candidate,pk=candidateId)
-    except Http404:
-        return Response(
-                {"error": "No applications for candidate with given Id exists"},
-                status=status.HTTP_404_NOT_FOUND   
-        )
+        candidate = Candidate.objects.get(pk=candidateId)
+        candidate_skills = set(candidate.cv.skills.split(','))
+        job_offers = JobOffer.objects.all()
+        matches = []
 
-    try:
-        cv = get_object_or_404(Resume,pk=candidate.cv_id)
-    except Http404:
-        return Response(
-                {"error": "No applications for candidate with given Id exists"},
-                status=status.HTTP_404_NOT_FOUND              
-        )
-    matches = Match.objects.all()
-    jobOffers = JobOffer.objects.all()
-    print(cv.skills.strip('[').strip(']'))
-    candidate_skills = cv.skills
-    print(candidate_skills)
-    for job in jobOffers:
-        job_skills = job.skills.split(',')
-        score = 0
-        for candidateSkill in candidate_skills:
-            for jobSkill in job_skills:
-                if candidateSkill == jobSkill:
-                    score = score + 1;
-        if(score!=0):
-            try:
-                match = Match.objects.get(jobOffer=job,candidate=candidate)
-                print("Objects already exists",match)
-                return Response(
-                    {"error": "Match already exists"},
-                    status=status.HTTP_409_CONFLICT
+        for job in job_offers:
+            
+            if Match.objects.filter(candidate=candidate, jobOffer=job).exists():
+                continue
+
+            job_skills = set(job.skills.split(','))
+            matched_skills = candidate_skills.intersection(job_skills)
+            if matched_skills:
+                match_score = (len(matched_skills) / len(job_skills)) * 100
+                matched_skills_str = ','.join(matched_skills)
+                new_match = Match(
+                    jobOffer=job,
+                    candidate=candidate,
+                    candidate_score=match_score,
+                    matchedSkills=matched_skills_str
                 )
-            except Match.DoesNotExist:    
-                match_score = (score/len(job_skills) ) * 100  
-                newMatch = Match(jobOffer=job,candidate=candidate,candidate_score=match_score)
-                print("Objects doesnt exists, a new match is created!") 
-                newMatch.save()
-                return Response(
-                    {"message":"Match created with success"},
-                    status=status.HTTP_200_OK
-                )
-        matches_serializer = MatchSerializer(matches,many=True)
-    return JsonResponse(matches_serializer.data,safe=False) 
+                new_match.save()
+                matches.append(new_match)
+
+        matches_serializer = MatchSerializer(matches, many=True)
+        return JsonResponse(matches_serializer.data, safe=False)
+    except Candidate.DoesNotExist:
+        return JsonResponse({'error': 'Candidate not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

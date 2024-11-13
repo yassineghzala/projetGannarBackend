@@ -35,7 +35,7 @@ class Match(models.Model):
     candidate_score = models.FloatField(null=True)
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
     jobOffer = models.ForeignKey(JobOffer, on_delete=models.CASCADE)
-
+    matchedSkills = models.CharField(max_length=255, null=True) 
 
 
 class Notification(models.Model):
