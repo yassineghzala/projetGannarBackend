@@ -4,7 +4,7 @@ from JobOffers.views import JobOfferGP, JobOfferGPD, apply, deleteApplicationByI
 
 urlpatterns = [
     path('jobs', JobOfferGP),
-    path('application/<int:CandidateId>/apply/<int:JobOfferId>', apply),
+     path('apply/<int:JobOfferId>/<int:CandidateId>', apply),
     path('jobs/<int:JobOfferId>', JobOfferGPD),
     path('matches/<int:CandidateId>', getMatches),
     path('getapplicationby/<int:candidateId>/and/<int:jobOfferId>', getApplicationByCandidateIdAndJobOfferId),

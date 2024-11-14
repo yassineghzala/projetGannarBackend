@@ -71,67 +71,68 @@ def getApplicationByCandidateIdAndJobOfferId(request,candidateId,jobOfferId):
         )
 
 
-@api_view(['GET'])
-def apply(request,JobOfferId,CandidateId):
-
+@api_view(['POST'])
+def apply(request, JobOfferId, CandidateId):
     try:
-        jobOffer = get_object_or_404(JobOffer,pk=JobOfferId)
+        print(JobOfferId)
+        jobOffer = get_object_or_404(JobOffer, pk=JobOfferId)
     except Http404:
         return Response(
-            {"error": "No jobOffer with given Id exists"},
+            {"error": "No job offer with the given ID exists"},
             status=status.HTTP_404_NOT_FOUND
-            )
-    try:
-        candidate = get_object_or_404(Candidate,pk=CandidateId)
-    except Http404:
-        return Response(
-            {"error": "No candidate with given Id exists"},
-            status=status.HTTP_404_NOT_FOUND
-            )
-    try:
-        cv = get_object_or_404(Resume,pk=candidate.cv_id)
-    except Http404:
-        return Response(
-            {"error": "No resume with given Id exists"},
-            status=status.HTTP_404_NOT_FOUND
-            )
-
-    candidate_skills = cv.skills
-    job_skills = jobOffer.skills.split(',')
+        )
 
     try:
-        applications = Application.objects.all()
+        candidate = get_object_or_404(Candidate, pk=CandidateId)
+    except Http404:
+        return Response(
+            {"error": "No candidate with the given ID exists"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        cv = get_object_or_404(Resume, pk=candidate.cv_id)
+    except Http404:
+        return Response(
+            {"error": "No resume with the given ID exists"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    candidate_skills = set(cv.skills.split(','))
+    job_skills = set(jobOffer.skills.split(','))
+
+    try:
+        if Application.objects.filter(jobOffer=jobOffer, candidate=candidate).exists():
+            return Response(
+                {"error": "Application already exists"},
+                status=status.HTTP_409_CONFLICT
+            )
     except DatabaseError:
         return Response(
             {"error": "Database error occurred."},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-    except Exception:
+
+    matched_skills = candidate_skills.intersection(job_skills)
+    match_score = (len(matched_skills) / len(job_skills)) * 100 if job_skills else 0
+
+    try:
+        newApplication = Application(jobOffer=jobOffer, candidate=candidate, candidate_score=match_score)
+        newApplication.save()
         return Response(
-            {"error": "An unexpected error occurred."},
+            {"message": "Application created successfully"},
+            status=status.HTTP_201_CREATED
+        )
+    except DatabaseError:
+        return Response(
+            {"error": "Database error occurred while saving the application."},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-    
-    if(request.method == 'GET'):
-        score = 0
-        for candidateSkill in candidate_skills:
-            for jobSkill in job_skills:
-                if candidateSkill==jobSkill:
-                    score = score + 1
-        try:
-            application = Application.objects.get(jobOffer=jobOffer,candidate=candidate)
-            return Response(
-                {"error": "Application already exists"},
-                status=status.HTTP_409_CONFLICT
-            )
-        except Application.DoesNotExist:
-            match_score = (score/len(job_skills) ) * 100  
-            newApplication = Application(jobOffer=jobOffer,candidate=candidate,candidate_score=match_score)
-            newApplication.save()
-            return Response(
-                {"message":"Application created with success"},
-                status=status.HTTP_200_OK
-            )
+    except Exception as e:
+        return Response(
+            {"error": f"An unexpected error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 # Notification views ------------------------------------------------
 @api_view(["GET"])
 def get_unread_notifications(request, recruiter_id):
@@ -259,10 +260,8 @@ def matchCandidateWithJobs(request, candidateId):
         matches = []
 
         for job in job_offers:
-            
             if Match.objects.filter(candidate=candidate, jobOffer=job).exists():
                 continue
-
             job_skills = set(job.skills.split(','))
             matched_skills = candidate_skills.intersection(job_skills)
             if matched_skills:
