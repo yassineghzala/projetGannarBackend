@@ -2,6 +2,7 @@ from django.db import DatabaseError
 from django.shortcuts import render, get_object_or_404
 from Candidates.models import Candidate, Resume
 from Candidates.serialisers import CandidateSerializer, ResumeSerializer
+from Candidates.views import VerifyToken
 from Recruiters.models import Recruiter
 from .models import Application, JobOffer, Match, Notification
 from rest_framework.views import APIView
@@ -399,7 +400,8 @@ def getJobOffersByRecruiter(request, recruiterId):
         )
 
 @api_view(['POST'])
-def matchCandidateWithJobs(request, candidateId):
+def matchCandidateWithJobs(request,candidateId):
+
     try:
         candidate = Candidate.objects.get(pk=candidateId)
         cv = get_object_or_404(Resume, pk=candidate.cv_id)
