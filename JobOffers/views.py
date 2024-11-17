@@ -126,6 +126,8 @@ def apply(request,JobOfferId,CandidateId):
             )
         except Application.DoesNotExist:
             match_score = (score/len(job_skills) ) * 100  
+            if(match_score>=100):
+                match_score = 100
             newApplication = Application(jobOffer=jobOffer,candidate=candidate,candidate_score=match_score)
             newApplication.save()
             return Response(
@@ -250,7 +252,7 @@ def getJobOffersByRecruiter(request,recruiterId):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )  
 
-@api_view(['POST'])
+@api_view(['GET'])
 def matchCandidateWithJobs(request,candidateId):
 
     try:
@@ -273,29 +275,34 @@ def matchCandidateWithJobs(request,candidateId):
     print(cv.skills.strip('[').strip(']'))
     candidate_skills = cv.skills
     print(candidate_skills)
+    matchejobs = []
     for job in jobOffers:
         job_skills = job.skills.split(',')
         score = 0
         for candidateSkill in candidate_skills:
+            
             for jobSkill in job_skills:
                 if candidateSkill == jobSkill:
                     score = score + 1;
         if(score!=0):
-            try:
-                match = Match.objects.get(jobOffer=job,candidate=candidate)
-                print("Objects already exists",match)
-                return Response(
-                    {"error": "Match already exists"},
-                    status=status.HTTP_409_CONFLICT
-                )
-            except Match.DoesNotExist:    
                 match_score = (score/len(job_skills) ) * 100  
                 newMatch = Match(jobOffer=job,candidate=candidate,candidate_score=match_score)
                 print("Objects doesnt exists, a new match is created!") 
                 newMatch.save()
-                return Response(
-                    {"message":"Match created with success"},
-                    status=status.HTTP_200_OK
-                )
+                score = 0
+            #try:
+            #    match = Match.objects.get(jobOffer=job,candidate=candidate)
+            #    print("Objects already exists",match)
+            #    return Response(
+            #        {"error": "Match already exists"},
+            #        status=status.HTTP_409_CONFLICT
+            #    )
+            #except Match.DoesNotExist:    
+            #
+            #    return Response(
+            #        {"message":"Match created with success"},
+            #        status=status.HTTP_200_OK
+            #    )
         matches_serializer = MatchSerializer(matches,many=True)
     return JsonResponse(matches_serializer.data,safe=False) 
+    

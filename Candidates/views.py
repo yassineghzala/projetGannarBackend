@@ -50,6 +50,11 @@ def create_access_token(request):
         'id': user.id,
         'name': user.name,
         'email': user.email,
+        'address': user.address,
+        'phoneNumber': user.phoneNumber,
+        'role': user.role,
+        'dateOfBirth': user.dateOfBirth,
+        
         'exp': datetime.utcnow() + timedelta(minutes=60),
         'iat': datetime.utcnow() - timedelta(hours=1)
     }
@@ -70,6 +75,10 @@ def create_refresh_token(request):
         'id': user.id,
         'name': user.name,
         'email': user.email,
+        'address': user.address,
+        'phoneNumber': user.phoneNumber,
+        'role': user.role,
+        'dateOfBirth': user.dateOfBirth,
         'exp': datetime.utcnow() + timedelta(minutes=120),
         'iat': datetime.utcnow() - timedelta(hours=1)
     }
