@@ -31,13 +31,15 @@ class RegisterView(APIView):
                 status=status.HTTP_409_CONFLICT
             )
         except Candidate.DoesNotExist:
-                serializer = CandidateSerializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(
-                    {"message": "candidate registered with success"},
-                    status=status.HTTP_200_OK
-                )
+            # Assign the role 'candidate' before saving
+            request.data['role'] = 'candidate'
+            serializer = CandidateSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                {"message": "candidate registered with success"},
+                status=status.HTTP_200_OK
+            )
 def create_access_token(request):
     email = request.data['email']
     password = request.data['password']
@@ -157,6 +159,17 @@ def CandidateGP(request):
             candidate_serializer.save()
         return JsonResponse(candidate_serializer.data,safe=False)
 
+@api_view(['GET'])
+def get_candidate_by_id(request, candidate_id):
+    try:
+        candidate = get_object_or_404(Candidate, pk=candidate_id)
+        serializer = CandidateSerializer(candidate)
+        return Response(serializer.data)
+    except Candidate.DoesNotExist:
+        return Response({'error': 'Candidate not found'}, status=404)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+    
 @api_view(['GET' , 'PUT' , 'DELETE'])
 def CandidateGPD(request,Id):
     candidate = get_object_or_404(Candidate,pk=Id)
@@ -171,6 +184,15 @@ def CandidateGPD(request,Id):
         candidate.delete();
     return JsonResponse(candidate_serializer.data)
 
+@api_view(['GET'])
+def get_recommended_candidates(request):
+    try:
+        candidates = Candidate.objects.filter(cv__res_score__gt=50)
+        serializer = CandidateSerializer(candidates, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+    
 @api_view(['GET'])
 def getCVByCandidateId(request,candidateId):
     if(request.method=='GET'):

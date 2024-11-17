@@ -27,8 +27,7 @@ class Application(models.Model):
     candidate_score = models.FloatField(null=True)
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
     jobOffer = models.ForeignKey(JobOffer, on_delete=models.CASCADE)
-
-
+    created_at = models.DateTimeField(default=timezone.now)
 
 class Match(models.Model):
     Id = models.AutoField(primary_key=True, editable=False)

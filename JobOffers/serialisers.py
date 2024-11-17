@@ -27,7 +27,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'Id',
             'candidate',
             'jobOffer',
-            'candidate_score'
+            'candidate_score',
+            'created_at',
         ]
 
 

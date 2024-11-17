@@ -189,8 +189,8 @@ def apply(request, JobOfferId, CandidateId):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-    candidate_skills = set(cv.skills.split(','))
-    job_skills = set(jobOffer.skills.split(','))
+    candidate_skills = set(skill.lower() for skill in cv.skills.strip('[]').replace("'", "").split(', '))
+    job_skills = set(skill.lower() for skill in jobOffer.skills.split(','))
 
     try:
         if Application.objects.filter(jobOffer=jobOffer, candidate=candidate).exists():
@@ -229,7 +229,6 @@ def apply(request, JobOfferId, CandidateId):
             {"error": f"An unexpected error occurred: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-
 @api_view(["GET"])
 def get_unread_notifications(request, recruiter_id):
     try:
@@ -403,14 +402,15 @@ def getJobOffersByRecruiter(request, recruiterId):
 def matchCandidateWithJobs(request, candidateId):
     try:
         candidate = Candidate.objects.get(pk=candidateId)
-        candidate_skills = set(candidate.cv.skills.split(','))
+        cv = get_object_or_404(Resume, pk=candidate.cv_id)
+        candidate_skills = set(skill.lower() for skill in cv.skills.strip('[]').replace("'", "").split(', '))
         job_offers = JobOffer.objects.all()
         matches = []
 
         for job in job_offers:
             if Match.objects.filter(candidate=candidate, jobOffer=job).exists():
                 continue
-            job_skills = set(job.skills.split(','))
+            job_skills = set(skill.lower() for skill in job.skills.split(','))
             matched_skills = candidate_skills.intersection(job_skills)
             if matched_skills:
                 match_score = (len(matched_skills) / len(job_skills)) * 100
