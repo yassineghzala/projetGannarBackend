@@ -54,7 +54,6 @@ def create_access_token(request):
         'phoneNumber': user.phoneNumber,
         'role': user.role,
         'dateOfBirth': user.dateOfBirth,
-        
         'exp': datetime.utcnow() + timedelta(minutes=60),
         'iat': datetime.utcnow() - timedelta(hours=1)
     }
@@ -84,7 +83,30 @@ def create_refresh_token(request):
     }
     token = jwt.encode(payload, 'secret', algorithm='HS256')
     return token        
-        
+
+def VerifyToken(request):
+    if(request.COOKIES.get('access') and request.COOKIES.get("refresh")):
+        access_token = request.COOKIES.get('access')
+        refresh_token = request.COOKIES.get("refresh")
+        try:
+            if isinstance(access_token, str) and isinstance(refresh_token, str):
+                access_token = access_token.encode('utf-8') 
+                refresh_token = refresh_token.encode('utf-8') 
+            payload_access = jwt.decode(access_token,'secret', algorithms=["HS256"], options={"verify_signature": False})
+            payload_refresh = jwt.decode(refresh_token,'secret',algorithms=["HS256"], options={"verify_signature": False})    
+            if(payload_access == payload_refresh):
+                return True
+            else:
+                return False
+            #user = Candidate.objects.filter(id=payload_access['id']).first()
+            #serializer = CandidateSerializer(user)
+            #print(serializer.data)
+            #return Response(serializer.data)
+    
+        except jwt.DecodeError as e:
+            print("Token decode error:", e)
+            return Response({'detail': 'Internal Server Error'}, status=500)
+
 class LoginView(APIView):
     def post(self,request):
         access_token = create_access_token(request)
@@ -94,7 +116,12 @@ class LoginView(APIView):
         response.set_cookie(key='access', value=access_token, httponly=True,samesite='None',secure=True)
         response.set_cookie(key='refresh', value=refresh_token, httponly=True,samesite='None',secure=True)
         return response
-
+    
+class Logout(APIView):
+    def get(self,request):
+        response = Response()
+        response.delete_cookie("access")
+        response.delete_cookie("refresh")
 
 #class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #    @classmethod
@@ -190,33 +217,3 @@ def getCVByCandidateId(request,candidateId):
         CV_serializer = ResumeSerializer(CV)
         return JsonResponse(CV_serializer.data,safe=False)
 
-from django.core.files.storage import default_storage
-import PyPDF2 # type: ignore
-@api_view(['POST'])
-@parser_classes([MultiPartParser, FormParser])
-def ResumeGP(request):
-    resumes = Resume.objects.all()
-    if(request.method == "POST"):
-        file = request.FILES.get('file')
-        file_path = default_storage.save('Resumes/' + file.name, file)
-        pdfReader = PyPDF2.PdfReader(file)
-        pageObj = pdfReader.pages[0]
-        ParsedCV = pageObj.extract_text()
-        ParsedCV = ParsedCV+'testString'
-        file2 = open(r"Resumes/CV.txt","w+")
-        file2.write(ParsedCV)
-        file2.close()
-        file2 = open("Resumes/CV.txt", "r")
-        list = file2.readlines()
- 
-        limit1 = list.index("Skills\n")
-        limit2 = limit1 + 2
-
-        skills = list[limit1 + 1: limit2]
-
-        skills = ''.join(skills)
-
-        resume = Resume(file=file_path,skills=skills)
-        resume.save() 
-        resumes_serializer = ResumeSerializer(resumes,many=True)
-        return JsonResponse(resumes_serializer.data,safe=False) 

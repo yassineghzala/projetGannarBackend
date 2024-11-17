@@ -1,6 +1,6 @@
 from django.urls import path
 
-from Candidates.views import CandidateGP, CandidateGPD, RegisterView, ResumeGP
+from Candidates.views import CandidateGP, CandidateGPD, RegisterView
 from JobOffers.views import JobOfferGP
 from .views import LoginView, UserView, getCVByCandidateId
 
@@ -13,7 +13,6 @@ urlpatterns = [
     path('candidates', CandidateGP),
     path('candidate', UserView.as_view()),
     path('recruiters/<int:Id>', CandidateGPD),
-    path('resumes', ResumeGP),
     path('candidateCV/<int:candidateId>',getCVByCandidateId),
     path('candidates/register',RegisterView.as_view()),
     path('candidate/login', LoginView.as_view()),

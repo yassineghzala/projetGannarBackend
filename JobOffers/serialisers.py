@@ -38,5 +38,6 @@ class MatchSerializer(serializers.ModelSerializer):
             'Id',
             'candidate',
             'jobOffer',
-            'candidate_score'
+            'candidate_score',
+            'matchedSkills'
         ]
