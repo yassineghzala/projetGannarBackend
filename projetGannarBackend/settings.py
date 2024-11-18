@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "Recruiters",
     "Candidates",
     "JobOffers",
+    'drf_yasg',
 
 ]
 
