@@ -375,6 +375,21 @@ def deleteApplicationById(request, applicationId):
         return JsonResponse({"error": "Database error occurred while deleting the application."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except Exception as e:
         return JsonResponse({"error": f"An unexpected error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['DELETE'])
+def deleteApplicationByCandidateIdAndJobOfferId(request, candidateId, jobOfferId):
+    """
+    Delete an application by CandidateId and JobOfferId.
+    """
+    try:
+        application = get_object_or_404(Application, candidate_id=candidateId, jobOffer_id=jobOfferId)
+        application.delete()
+        return Response({"message": "Application deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    except Application.DoesNotExist:
+        return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 
 @api_view(['GET'])
 def getJobOffersByRecruiter(request, recruiterId):
